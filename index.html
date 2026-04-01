@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report a Local Issue</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1f2435;
+    --border: #2a2f42;
+    --accent: #4ade80;
+    --accent2: #22d3ee;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --danger: #f87171;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 60px;
+  }
+
+  /* Header */
+  .header {
+    width: 100%;
+    max-width: 480px;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.25);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .08em;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  h1 {
+    font-size: clamp(22px, 5vw, 28px);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Card */
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Field */
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .05em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .field input, .field textarea, .field select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 12px 14px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    width: 100%;
+  }
+
+  .field input:focus, .field textarea:focus, .field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(74,222,128,0.12);
+  }
+
+  .field textarea { resize: none; height: 80px; line-height: 1.5; }
+  .field select option { background: var(--surface2); }
+
+  /* Photo upload */
+  .upload-area {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .upload-area:hover { border-color: var(--accent); background: rgba(74,222,128,0.04); }
+  .upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+  .upload-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: rgba(74,222,128,0.1);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 20px;
+  }
+
+  .upload-text { font-size: 14px; color: var(--muted); }
+  .upload-text strong { color: var(--text); display: block; margin-bottom: 2px; }
+
+  #preview {
+    width: 100%; border-radius: var(--radius);
+    display: none; margin-top: 12px;
+    max-height: 220px; object-fit: cover;
+  }
+
+  /* Location */
+  .loc-row { display: flex; gap: 8px; }
+  .loc-row input { flex: 1; }
+  .loc-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--accent);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .2s, border-color .2s;
+    flex-shrink: 0;
+  }
+  .loc-btn:hover { background: rgba(74,222,128,0.08); border-color: var(--accent); }
+  #loc-status { font-size: 12px; color: var(--accent); margin-top: 4px; display: none; }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    color: #0f1117;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: opacity .2s, transform .15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  .submit-btn:hover { opacity: 0.88; }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* Success */
+  #success {
+    display: none;
+    text-align: center;
+    padding: 40px 24px;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .success-icon {
+    width: 64px; height: 64px;
+    background: rgba(74,222,128,0.12);
+    border: 2px solid rgba(74,222,128,0.3);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+
+  #success h2 { font-size: 20px; }
+  #success p { color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 300px; }
+
+  #complaint-id {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: var(--accent);
+    letter-spacing: .05em;
+  }
+
+  /* Error msg */
+  .error-msg { font-size: 12px; color: var(--danger); display: none; margin-top: 2px; }
+
+  /* Spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(15,17,23,0.3);
+    border-top-color: #0f1117;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">Civic Reporter</div>
+  <h1>Report a <span>Local Issue</span></h1>
+  <p class="subtitle">Upload a photo of any civic problem — broken roads, garbage, water leakage — and we'll file it automatically.</p>
+</div>
+
+<div class="card" id="form-card">
+
+  <!-- Photo -->
+  <div class="field">
+    <label>📷 Photo of the issue</label>
+    <div class="upload-area" id="upload-area">
+      <input type="file" id="photo" accept="image/*" capture="environment" onchange="previewPhoto(this)">
+      <div class="upload-icon">📸</div>
+      <div class="upload-text">
+        <strong>Tap to take a photo</strong>
+        or choose from gallery
+      </div>
+    </div>
+    <img id="preview" alt="Preview"/>
+    <span class="error-msg" id="photo-err">Please add a photo of the issue.</span>
+  </div>
+
+  <!-- Location -->
+  <div class="field">
+    <label>📍 Location</label>
+    <div class="loc-row">
+      <input type="text" id="location-text" placeholder="e.g. Near SG Highway, Ahmedabad" />
+      <button class="loc-btn" onclick="getLocation()">📡 Auto</button>
+    </div>
+    <span id="loc-status">✓ GPS location captured</span>
+    <span class="error-msg" id="loc-err">Please enter or capture your location.</span>
+  </div>
+
+  <input type="hidden" id="lat" />
+  <input type="hidden" id="lng" />
+
+  <!-- Issue type -->
+  <div class="field">
+    <label>🔧 Issue Type</label>
+    <select id="issue-type">
+      <option value="">Let AI detect automatically</option>
+      <option value="road">🛣️ Broken road / pothole</option>
+      <option value="garbage">🗑️ Garbage / waste</option>
+      <option value="water">💧 Water leakage / flooding</option>
+      <option value="streetlight">💡 Broken streetlight</option>
+      <option value="other">⚠️ Other</option>
+    </select>
+  </div>
+
+  <!-- Description -->
+  <div class="field">
+    <label>📝 Description (optional)</label>
+    <textarea id="description" placeholder="Any extra details about the problem..."></textarea>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Reporter info -->
+  <div class="field">
+    <label>👤 Your Name</label>
+    <input type="text" id="name" placeholder="Full name" />
+  </div>
+
+  <div class="field">
+    <label>📱 Phone / WhatsApp</label>
+    <input type="tel" id="phone" placeholder="+91 98765 43210" />
+    <span class="error-msg" id="phone-err">Please enter your phone number.</span>
+  </div>
+
+  <!-- Submit -->
+  <button class="submit-btn" id="submit-btn" onclick="submitComplaint()">
+    <span id="btn-text">🚀 Submit Complaint</span>
+    <div class="spinner" id="spinner"></div>
+  </button>
+
+</div>
+
+<!-- Success state -->
+<div class="card" id="success">
+  <div class="success-icon">✅</div>
+  <h2>Complaint Filed!</h2>
+  <p>Your report has been sent to the relevant department. You'll receive a confirmation on WhatsApp shortly.</p>
+  <div id="complaint-id"></div>
+  <button class="submit-btn" style="max-width:200px;margin-top:8px" onclick="resetForm()">Report Another</button>
+</div>
+
+<script>
+  // ⚠️ REPLACE THIS with your actual n8n webhook URL in Step 3
+  const WEBHOOK_URL = "YOUR_N8N_WEBHOOK_URL_HERE";
+
+  function previewPhoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const preview = document.getElementById('preview');
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = 'block';
+    document.getElementById('upload-area').style.borderColor = 'var(--accent)';
+  }
+
+  function getLocation() {
+    const btn = document.querySelector('.loc-btn');
+    btn.textContent = '⏳ Getting...';
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        document.getElementById('lat').value = pos.coords.latitude;
+        document.getElementById('lng').value = pos.coords.longitude;
+        document.getElementById('location-text').value =
+          `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+        document.getElementById('loc-status').style.display = 'block';
+        btn.textContent = '✓ Got it';
+      },
+      () => {
+        btn.textContent = '📡 Auto';
+        alert('Could not get location. Please type it manually.');
+      }
+    );
+  }
+
+  function toBase64(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result.split(',')[1]);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+
+  function generateId() {
+    return 'CMP-' + Date.now().toString(36).toUpperCase();
+  }
+
+  async function submitComplaint() {
+    // Validation
+    let valid = true;
+    const photo = document.getElementById('photo').files[0];
+    const location = document.getElementById('location-text').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+
+    document.getElementById('photo-err').style.display = photo ? 'none' : 'block';
+    document.getElementById('loc-err').style.display = location ? 'none' : 'block';
+    document.getElementById('phone-err').style.display = phone ? 'none' : 'block';
+
+    if (!photo || !location || !phone) return;
+
+    // Loading state
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    document.getElementById('btn-text').textContent = 'Submitting...';
+    document.getElementById('spinner').style.display = 'block';
+
+    try {
+      const imageBase64 = await toBase64(photo);
+      const complaintId = generateId();
+
+      const payload = {
+        complaint_id: complaintId,
+        name: document.getElementById('name').value.trim() || 'Anonymous',
+        phone: phone,
+        location_text: location,
+        lat: document.getElementById('lat').value,
+        lng: document.getElementById('lng').value,
+        issue_type: document.getElementById('issue-type').value,
+        description: document.getElementById('description').value.trim(),
+        image_base64: imageBase64,
+        image_mime: photo.type,
+        submitted_at: new Date().toISOString(),
+      };
+
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      // Show success
+      document.getElementById('form-card').style.display = 'none';
+      const s = document.getElementById('success');
+      s.style.display = 'flex';
+      document.getElementById('complaint-id').textContent = complaintId;
+
+    } catch (err) {
+      alert('Something went wrong. Please try again.');
+      btn.disabled = false;
+      document.getElementById('btn-text').textContent = '🚀 Submit Complaint';
+      document.getElementById('spinner').style.display = 'none';
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('success').style.display = 'none';
+    document.getElementById('form-card').style.display = 'flex';
+    document.getElementById('photo').value = '';
+    document.getElementById('preview').style.display = 'none';
+    document.getElementById('location-text').value = '';
+    document.getElementById('description').value = '';
+    document.getElementById('name').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('loc-status').style.display = 'none';
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = false;
+    document.getElementById('btn-text').textContent = '🚀 Submit Complaint';
+    document.getElementById('spinner').style.display = 'none';
+  }
+</script>
+</body>
+</html>
