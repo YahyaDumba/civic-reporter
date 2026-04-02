@@ -268,7 +268,6 @@
     <label>📷 Photo of the issue</label>
     <div class="upload-area" id="upload-area">
       <input type="file" id="photo" accept="image/*" capture="environment" onchange="previewPhoto(this)">
-      <div class="upload-icon">📸</div>
       <div class="upload-text">
         <strong>Tap to take a photo</strong>
         or choose from gallery
@@ -280,12 +279,12 @@
 
   <!-- Location -->
   <div class="field">
-    <label>📍 Location</label>
+    <label>Location</label>
     <div class="loc-row">
       <input type="text" id="location-text" placeholder="e.g. Near SG Highway, Ahmedabad" />
-      <button class="loc-btn" onclick="getLocation()">📡 Auto</button>
+      <button class="loc-btn" onclick="getLocation()">Auto Fetch</button>
     </div>
-    <span id="loc-status">✓ GPS location captured</span>
+    <span id="loc-status">GPS location captured</span>
     <span class="error-msg" id="loc-err">Please enter or capture your location.</span>
   </div>
 
@@ -296,18 +295,18 @@
   <div class="field">
     <label>🔧 Issue Type</label>
     <select id="issue-type">
-      <option value="">Let AI detect automatically</option>
-      <option value="road">🛣️ Broken road / pothole</option>
-      <option value="garbage">🗑️ Garbage / waste</option>
-      <option value="water">💧 Water leakage / flooding</option>
-      <option value="streetlight">💡 Broken streetlight</option>
-      <option value="other">⚠️ Other</option>
+      <!-- <option value="">Let AI detect automatically</option> -->
+      <option value="road">Broken road / pothole</option>
+      <option value="garbage">Garbage / waste</option>
+      <option value="water">Water leakage / flooding</option>
+      <option value="streetlight">Broken streetlight</option>
+      <option value="other">Other</option>
     </select>
   </div>
 
   <!-- Description -->
   <div class="field">
-    <label>📝 Description (optional)</label>
+    <label>Description (optional)</label>
     <textarea id="description" placeholder="Any extra details about the problem..."></textarea>
   </div>
 
@@ -315,19 +314,19 @@
 
   <!-- Reporter info -->
   <div class="field">
-    <label>👤 Your Name</label>
+    <label>Your Name</label>
     <input type="text" id="name" placeholder="Full name" />
   </div>
 
   <div class="field">
-    <label>📱 Phone / WhatsApp</label>
+    <label>Phone / WhatsApp</label>
     <input type="tel" id="phone" placeholder="+91 98765 43210" />
     <span class="error-msg" id="phone-err">Please enter your phone number.</span>
   </div>
 
   <!-- Submit -->
   <button class="submit-btn" id="submit-btn" onclick="submitComplaint()">
-    <span id="btn-text">🚀 Submit Complaint</span>
+    <span id="btn-text">Submit Complaint</span>
     <div class="spinner" id="spinner"></div>
   </button>
 
@@ -335,7 +334,7 @@
 
 <!-- Success state -->
 <div class="card" id="success">
-  <div class="success-icon">✅</div>
+  <!-- <div class="success-icon">✅</div> -->
   <h2>Complaint Filed!</h2>
   <p>Your report has been sent to the relevant department. You'll receive a confirmation on WhatsApp shortly.</p>
   <div id="complaint-id"></div>
@@ -343,7 +342,6 @@
 </div>
 
 <script>
-  // ⚠️ REPLACE THIS with your actual n8n webhook URL in Step 3
   const WEBHOOK_URL = "https://yahyadumba.app.n8n.cloud/webhook-test/complaint";
 
   function previewPhoto(input) {
@@ -357,7 +355,7 @@
 
   function getLocation() {
     const btn = document.querySelector('.loc-btn');
-    btn.textContent = '⏳ Getting...';
+    btn.textContent = 'Getting...';
     navigator.geolocation.getCurrentPosition(
       pos => {
         document.getElementById('lat').value = pos.coords.latitude;
@@ -365,10 +363,10 @@
         document.getElementById('location-text').value =
           `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
         document.getElementById('loc-status').style.display = 'block';
-        btn.textContent = '✓ Got it';
+        btn.textContent = 'Got it';
       },
       () => {
-        btn.textContent = '📡 Auto';
+        btn.textContent = 'Auto';
         alert('Could not get location. Please type it manually.');
       }
     );
@@ -440,7 +438,7 @@
     } catch (err) {
       alert('Something went wrong. Please try again.');
       btn.disabled = false;
-      document.getElementById('btn-text').textContent = '🚀 Submit Complaint';
+      document.getElementById('btn-text').textContent = 'Submit Complaint';
       document.getElementById('spinner').style.display = 'none';
     }
   }
